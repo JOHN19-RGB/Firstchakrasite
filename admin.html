@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Аура мед — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Cormorant+Unicase:wght@300;500&family=Outfit:wght@200;300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-0: #08040f;
+      --bg-1: rgba(243, 236, 216, .03);
+      --ink: #f3ecd8;
+      --ink-dim: rgba(243, 236, 216, .70);
+      --ink-faint: rgba(243, 236, 216, .36);
+      --gold: #e8c77a;
+      --gold-dim: rgba(232, 199, 122, .12);
+      --gold-border: rgba(232, 199, 122, .22);
+      --green: #4ade80;
+      --red: #e63946;
+    }
+
+    html,
+    body {
+      background: var(--bg-0);
+      color: var(--ink);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    body {
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(176, 132, 240, .15), transparent 45%),
+        radial-gradient(ellipse at 85% 100%, rgba(230, 57, 70, .10), transparent 45%),
+        radial-gradient(ellipse at 50% 50%, rgba(20, 10, 40, .92), var(--bg-0) 65%);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: .045;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 2.5rem;
+      background: linear-gradient(to bottom, rgba(8, 4, 15, .88), transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(232, 199, 122, .07);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .nav-mark {
+      font-family: 'Cormorant Unicase', serif;
+      font-size: .8rem;
+      letter-spacing: .38em;
+      color: var(--gold);
+    }
+
+    .nav-badge {
+      font-size: .58rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      border: 1px solid var(--gold-border);
+      padding: .2rem .65rem;
+      border-radius: 2rem;
+    }
+
+    .live-dot {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .62rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--green);
+    }
+
+    .live-dot::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .55;
+        transform: scale(.85);
+      }
+    }
+
+    /* ── MAIN ── */
+    .admin-main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 7rem 2rem 5rem;
+    }
+
+    /* ── HEADER ── */
+    .admin-header {
+      margin-bottom: 2.5rem;
+      animation: fadeUp .9s .1s both;
+    }
+
+    .eyebrow {
+      font-size: .65rem;
+      letter-spacing: .44em;
+      color: var(--gold);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: .8rem;
+    }
+
+    .admin-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .admin-header h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    /* ── STATS ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+      animation: fadeUp .9s .2s both;
+    }
+
+    @media(max-width:620px) {
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .stat-card {
+      background: var(--bg-1);
+      border: 1px solid var(--gold-border);
+      border-radius: .9rem;
+      padding: 1.3rem 1.5rem;
+    }
+
+    .stat-label {
+      font-size: .6rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: .5rem;
+    }
+
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 400;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-sub {
+      font-size: .72rem;
+      color: var(--ink-faint);
+      margin-top: .3rem;
+    }
+
+    /* ── FILTERS ── */
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      margin-bottom: 1.4rem;
+      flex-wrap: wrap;
+      animation: fadeUp .9s .3s both;
+    }
+
+    .filter-btn {
+      padding: .45rem 1.1rem;
+      background: none;
+      border: 1px solid var(--gold-border);
+      border-radius: 2rem;
+      color: var(--ink-faint);
+      font-family: 'Outfit', sans-serif;
+      font-size: .7rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .25s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .filter-btn.active {
+      background: var(--gold-dim);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .filter-date {
+      margin-left: auto;
+      background: var(--bg-1);
+      border: 1px solid var(--gold-border);
+      border-radius: .5rem;
+      padding: .42rem .9rem;
+      color: var(--ink-dim);
+      font-family: 'Outfit', sans-serif;
+      font-size: .8rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .25s;
+    }
+
+    .filter-date:focus {
+      border-color: var(--gold);
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      animation: fadeUp .9s .35s both;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-1);
+      border: 1px solid var(--gold-border);
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+
+    thead tr {
+      border-bottom: 1px solid var(--gold-border);
+    }
+
+    th {
+      padding: 1rem 1.2rem;
+      text-align: left;
+      font-size: .6rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(243, 236, 216, .05);
+      transition: background .2s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--gold-dim);
+    }
+
+    tbody tr.new-row {
+      animation: highlight .8s ease;
+    }
+
+    @keyframes highlight {
+      0% {
+        background: rgba(232, 199, 122, .18);
+      }
+
+      100% {
+        background: transparent;
+      }
+    }
+
+    td {
+      padding: .95rem 1.2rem;
+      font-size: .88rem;
+      color: var(--ink-dim);
+      vertical-align: middle;
+    }
+
+    .td-date {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .td-time {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .td-name {
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    .td-phone {
+      font-size: .82rem;
+      letter-spacing: .04em;
+    }
+
+    .td-reg {
+      font-size: .75rem;
+      color: var(--ink-faint);
+      white-space: nowrap;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: .2rem .7rem;
+      border-radius: 2rem;
+      font-size: .6rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .status-upcoming {
+      background: rgba(232, 199, 122, .12);
+      color: var(--gold);
+      border: 1px solid rgba(232, 199, 122, .25);
+    }
+
+    .status-past {
+      background: rgba(243, 236, 216, .05);
+      color: var(--ink-faint);
+      border: 1px solid rgba(243, 236, 216, .1);
+    }
+
+    .status-today {
+      background: rgba(74, 222, 128, .1);
+      color: var(--green);
+      border: 1px solid rgba(74, 222, 128, .25);
+    }
+
+    /* ── EMPTY ── */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--ink-faint);
+      font-size: .88rem;
+      letter-spacing: .15em;
+    }
+
+    .empty-glyph {
+      font-size: 2rem;
+      color: var(--gold-border);
+      margin-bottom: 1rem;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 500;
+      background: rgba(8, 4, 15, .95);
+      border: 1px solid var(--gold-border);
+      border-radius: .8rem;
+      padding: .9rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-size: .82rem;
+      color: var(--ink-dim);
+      backdrop-filter: blur(12px);
+      animation: slideUp .4s both;
+      max-width: 320px;
+    }
+
+    .toast-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 1;
+        transform: none;
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+    }
+
+    /* ── KEYFRAMES ── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @media(max-width:680px) {
+      nav {
+        padding: 1rem 1.2rem;
+      }
+
+      .nav-badge {
+        display: none;
+      }
+
+      th:nth-child(5),
+      td:nth-child(5) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-left">
+      <span class="nav-mark">✦ Аура мед</span>
+      <span class="nav-badge">Admin</span>
+    </div>
+    <div class="live-dot" id="live-indicator">Холбогдож байна…</div>
+  </nav>
+
+  <main class="admin-main">
+
+    <div class="admin-header">
+      <span class="eyebrow">Захиалгын самбар</span>
+      <h1>Уулзалтын <em>захиалгууд</em></h1>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Өнөөдрийн захиалга</div>
+        <div class="stat-value" id="stat-today">—</div>
+        <div class="stat-sub" id="stat-today-label">шинэчлэгдэж байна</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Удахгүй болох</div>
+        <div class="stat-value" id="stat-upcoming">—</div>
+        <div class="stat-sub">ирэх 7 хоногт</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Нийт захиалга</div>
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-sub">бүх цаг</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <button class="filter-btn active" data-filter="all">Бүгд</button>
+      <button class="filter-btn" data-filter="today">Өнөөдөр</button>
+      <button class="filter-btn" data-filter="upcoming">Удахгүй</button>
+      <button class="filter-btn" data-filter="past">Өнгөрсөн</button>
+      <input type="date" class="filter-date" id="filter-date" title="Өдрөөр шүүх">
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table id="bookings-table">
+        <thead>
+          <tr>
+            <th>Огноо</th>
+            <th>Цаг</th>
+            <th>Нэр</th>
+            <th>Утас</th>
+            <th>Төлөв</th>
+            <th>Бүртгэсэн</th>
+          </tr>
+        </thead>
+        <tbody id="bookings-body">
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-glyph">✦</div>Ачааллаж байна…
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const supabase = createClient(
+      'https://qvsveyaarinogkquyisb.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2c3ZleWFhcmlub2drcXV5aXNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MjYwOTMsImV4cCI6MjA5MzEwMjA5M30.wx0Pc-TbORp2b7Sr_sAP85Y23KtJj1fPYbLpEXZPTTI'
+    )
+
+    const MN_MONTH = ['1-р сар', '2-р сар', '3-р сар', '4-р сар', '5-р сар', '6-р сар',
+      '7-р сар', '8-р сар', '9-р сар', '10-р сар', '11-р сар', '12-р сар']
+
+    let allBookings = []
+    let activeFilter = 'all'
+
+    function todayISO() {
+      const d = new Date()
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    }
+
+    function formatDisplayDate(iso) {
+      const [y, m, d] = iso.split('-')
+      return `${MN_MONTH[+m - 1]} ${+d}`
+    }
+
+    function formatRegistered(iso) {
+      const d = new Date(iso)
+      const date = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`
+      const time = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+      return `${date} ${time}`
+    }
+
+    function getStatus(bookingDate) {
+      const today = todayISO()
+      if (bookingDate === today) return 'today'
+      if (bookingDate > today) return 'upcoming'
+      return 'past'
+    }
+
+    function statusLabel(s) {
+      if (s === 'today') return 'Өнөөдөр'
+      if (s === 'upcoming') return 'Удахгүй'
+      return 'Өнгөрсөн'
+    }
+
+    function applyFilter(bookings) {
+      const dateVal = document.getElementById('filter-date').value
+      if (dateVal) return bookings.filter(b => b.booking_date === dateVal)
+
+      const today = todayISO()
+      const in7 = new Date(); in7.setDate(in7.getDate() + 7)
+      const in7ISO = in7.toISOString().slice(0, 10)
+
+      if (activeFilter === 'today') return bookings.filter(b => b.booking_date === today)
+      if (activeFilter === 'upcoming') return bookings.filter(b => b.booking_date > today && b.booking_date <= in7ISO)
+      if (activeFilter === 'past') return bookings.filter(b => b.booking_date < today)
+      return bookings
+    }
+
+    function updateStats(bookings) {
+      const today = todayISO()
+      const in7 = new Date(); in7.setDate(in7.getDate() + 7)
+      const in7ISO = in7.toISOString().slice(0, 10)
+
+      const todayCount = bookings.filter(b => b.booking_date === today).length
+      const upcomingCount = bookings.filter(b => b.booking_date > today && b.booking_date <= in7ISO).length
+
+      document.getElementById('stat-today').textContent = todayCount
+      document.getElementById('stat-upcoming').textContent = upcomingCount
+      document.getElementById('stat-total').textContent = bookings.length
+
+      const d = new Date()
+      document.getElementById('stat-today-label').textContent =
+        `${d.getMonth() + 1}-р сарын ${d.getDate()}`
+    }
+
+    function renderTable(bookings, newId = null) {
+      const tbody = document.getElementById('bookings-body')
+      const visible = applyFilter(bookings)
+
+      if (!visible.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-glyph">✦</div>Захиалга байхгүй байна</div></td></tr>`
+        return
+      }
+
+      const sorted = [...visible].sort((a, b) => {
+        const d = a.booking_date.localeCompare(b.booking_date)
+        return d !== 0 ? d : a.booking_time.localeCompare(b.booking_time)
+      })
+
+      tbody.innerHTML = sorted.map(b => {
+        const status = getStatus(b.booking_date)
+        const isNew = b.id === newId
+        return `<tr class="${isNew ? 'new-row' : ''}">
+      <td class="td-date">${formatDisplayDate(b.booking_date)}</td>
+      <td class="td-time">${b.booking_time}</td>
+      <td class="td-name">${b.name}</td>
+      <td class="td-phone">${b.phone}</td>
+      <td><span class="status-badge status-${status}">${statusLabel(status)}</span></td>
+      <td class="td-reg">${b.created_at ? formatRegistered(b.created_at) : '—'}</td>
+    </tr>`
+      }).join('')
+    }
+
+    function showToast(name, date, time) {
+      const existing = document.querySelector('.toast')
+      if (existing) existing.remove()
+
+      const toast = document.createElement('div')
+      toast.className = 'toast'
+      toast.innerHTML = `<div class="toast-dot"></div>
+    <span>Шинэ захиалга: <strong>${name}</strong> — ${formatDisplayDate(date)} ${time}</span>`
+      document.body.appendChild(toast)
+
+      setTimeout(() => {
+        toast.style.animation = 'slideDown .4s both'
+        setTimeout(() => toast.remove(), 400)
+      }, 4000)
+    }
+
+    /* ── Load all bookings ── */
+    async function loadBookings() {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('booking_date', { ascending: true })
+        .order('booking_time', { ascending: true })
+
+      if (error) {
+        document.getElementById('bookings-body').innerHTML =
+          `<tr><td colspan="6"><div class="empty-state">Алдаа гарлаа: ${error.message}</div></td></tr>`
+        return
+      }
+
+      allBookings = data || []
+      updateStats(allBookings)
+      renderTable(allBookings)
+    }
+
+    /* ── Realtime subscription ── */
+    supabase
+      .channel('bookings-admin')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bookings' }, payload => {
+        const newRow = payload.new
+        allBookings = [newRow, ...allBookings]
+        updateStats(allBookings)
+        renderTable(allBookings, newRow.id)
+        showToast(newRow.name, newRow.booking_date, newRow.booking_time)
+      })
+      .subscribe(status => {
+        const indicator = document.getElementById('live-indicator')
+        if (status === 'SUBSCRIBED') {
+          indicator.textContent = 'Realtime'
+        } else {
+          indicator.textContent = 'Холбогдож байна…'
+        }
+      })
+
+    /* ── Filter buttons ── */
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        activeFilter = btn.dataset.filter
+        document.getElementById('filter-date').value = ''
+        renderTable(allBookings)
+      })
+    })
+
+    document.getElementById('filter-date').addEventListener('change', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
+      activeFilter = 'custom'
+      renderTable(allBookings)
+    })
+
+    loadBookings()
+  </script>
+</body>
+
+</html>
